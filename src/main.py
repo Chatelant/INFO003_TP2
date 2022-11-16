@@ -1,7 +1,7 @@
 import copy
+from models.Coloration import Coloration, Color
+from models.Graph import Graph
 
-from src.models.Coloration import Coloration, Color
-from src.models.Graph import Graph
 
 # ----- Utils ----- #
 def initColoration(graph : Graph):
@@ -14,12 +14,21 @@ def initColoration(graph : Graph):
 # Vérifie si le graph est 3-coloriable avec la coloration donnée
 def verificateur(graph: Graph, coloration: Coloration):
     for node in range(len(graph.nodes)):
+        # Recuperation de la couleur courante
         colorCurr = coloration.nodes[node]
+        
+        # Pour chaques voisins
         for neigbour in graph.nodes[node]:
-            if coloration.nodes[neigbour - 1] == colorCurr:
+            
+            # On considère que la présence d'une chaine de caractère vide est valide
+            if coloration.nodes[neigbour -1] == '':
+                break
+                
+            # Si la coloration est la même que le noeud courant
+            if coloration.nodes[neigbour - 1] == colorCurr or colorCurr == Color.NULL:
                 return False
+            
     return True
-
 
 # -------------------- Question 2 -------------------- #
 
@@ -54,29 +63,48 @@ def genereEtTeste(graph: Graph):
 # -------------------- Question 3 -------------------- #
 # Retourne la couleur suivante à tester
 def nextColor(color: Color):
-    if color == Color.RED:
+    if color == '':
+        return Color.RED
+    elif color == Color.RED:
         return Color.GREEN
     elif color == Color.GREEN:
         return Color.BLUE
-    else:
+    elif color == Color.BLUE:
         return Color.NULL
 
+# Fonction récursive
+def solvBackTrackingRec(graph, color, index):
+    while color.nodes[index] != Color.NULL:
+        color.nodes[index] = nextColor(color.nodes[index])
+        if verificateur(graph, color):
+            if(index == len(graph.nodes) - 1):
+                return True
+            if(solvBackTrackingRec(graph,color, index + 1)):
+                return True
+    color.nodes[index] = ''
+    return False
 
+# Fonction principale
 def solvBackTracking(graph: Graph):
     currIndex = 0
     coloration = initColoration(graph)
-    pass
+    solvBackTrackingRec(graph, coloration, currIndex)
+    return coloration
 
 
 if __name__ == "__main__":
     # Création graph
-    graph = Graph('exemples/3C_vrai.txt')
+    graph = Graph('exemples/3C_vrai20.txt')
+    # print(graph)
 
     # Coloration
-    coloration = Coloration([Color.BLUE, Color.GREEN, Color.RED, Color.RED])
+    # colorationMain = Coloration([Color.RED, Color.GREEN, Color.BLUE, Color.BLUE])
 
     # Verification du graph d'entrée
-    # print(verificateur(graph, coloration))
+    # print(verificateur(graph, colorationMain))
 
     # Verification de toutes les possibilitées
-    print(genereEtTeste(graph))
+    # print(genereEtTeste(graph))
+    
+    # Backtracking
+    # print(f"Question 3 -> {solvBackTracking(graph)}")

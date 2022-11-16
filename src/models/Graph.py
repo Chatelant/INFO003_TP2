@@ -18,3 +18,9 @@ class Graph:
                 self.nodes[n2-1].append(n1)
                 buf = file.readline()
             file.close()
+    def __str__(self):
+        buf = "["
+        for node in self.nodes:
+            buf += f" {node},"
+        buf += "]"
+        return buf

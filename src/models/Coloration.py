@@ -9,5 +9,11 @@ class Color(Enum):
 
 
 class Coloration:
-    def __init__(self, nodes: [Color]):
+    def __init__(self, nodes):
         self.nodes = nodes
+    
+    def __str__(self):
+        res = ""
+        for color in self.nodes:
+            res += f"[{color}] "
+        return res
