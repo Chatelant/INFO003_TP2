@@ -67,33 +67,37 @@ def solveClique(g, size, versatile):
 
     ####  La suite est à compléter/modifier (décommentez petit à petit les lignes commençant par #)
 
-    n = ???  # nombre de noeuds du graphe
+    n = len(g.nodes) # nombre de noeuds du graphe
 
     """ 
-    Nos variables seront X1,...,Xn
+    Nos variables seront X1, ..., Xn
     """
+
+    nodes = []
+    for i in range(1, n + 1):
+        nodes.append(i)
 
     """
     On veut que la clique soit de taille `size'.
-    Donc parmi les n variables X1,...,Xn, exactement `size' doivent
-    être vraies.
+    Donc parmi les n variables X1, ..., Xn, exactement `size' doivent être vraies.
     Déjà n variables sont utilisées, donc les nouvelles variables commenceront à n+1.
     """
-    # cnf = counter(???,???,n+1)
-
+    cnf = counter(nodes, size, n+1)
+    
     """
-    Pour chaque paire de sommets (u,v), si (u,v) n'est pas une arête, on rajoute 
+    Pour chaque paire de sommets (u, v), si (u, v) n'est pas une arête, on rajoute 
     la contrainte qu'une des extrémités ne doit pas appartenir à la clique.
     """
-    # for u in range(1,n+1):
-    # for v in range(1,u):
-    # ???
+    for u in range(1, n + 1): 
+        for v in range(1, u):
+            if v not in g.nodes[u - 1]:
+                cnf.append([-u, -v])
 
     if versatile:
         print("Entrée pour le SAT solveur")
         print(cnf)
 
-    return solveSAT(cnf)
+    return cnf
 
 
 if __name__ == '__main__':
@@ -112,7 +116,7 @@ if __name__ == '__main__':
         versatile = False
 
     ######## Récupérer le graphe stocké dans le fichier <filename>
-    g = Graph('exemples/3C_vrai20.txt')
+    g = Graph(filename)
 
     ######## Si c'est possible pour votre structure de données, vous pouvez afficher le graphe
     if versatile:
@@ -120,12 +124,13 @@ if __name__ == '__main__':
         print(g)
 
     solution = solveClique(g, size, versatile)
+    result = solveSAT(solution)
 
     if versatile:
         print("Solution pour SAT")
-        print(solution)
+        print(result)
     print("Solution pour le problème Clique")
-    if solution != "UNSAT":
-        print([i for i in solution[:len(g.nodes)] if i > 0])
+    if result != "UNSAT":
+        print([i for i in result[:len(g.nodes)] if i > 0])
     else:
         print("Pas de clique de taille " + str(size) + ".")
