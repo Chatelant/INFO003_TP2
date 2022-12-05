@@ -1,4 +1,5 @@
 import copy
+import random
 from models.Coloration import Coloration, Color
 from models.Graph import Graph
 
@@ -56,7 +57,7 @@ def genColoration(graph: Graph, coloration: Coloration, indice: int):
 # et test pour chacune jusqu'à ce qu'on trouve une 3-coloration ou
 # qu'il n'y en ait aucune possible
 def genereEtTeste(graph: Graph):
-    coloration =initColoration(graph)
+    coloration = initColoration(graph)
     return genColoration(graph, coloration, 0)
 
 
@@ -91,6 +92,54 @@ def solvBackTracking(graph: Graph):
     solvBackTrackingRec(graph, coloration, currIndex)
     return coloration
 
+# -------------------- Question 4 -------------------- #
+# Retourne une couleur aléatoire
+def getRandomColor():
+    rand = random.randrange(0,3)
+    if(rand == 0): return Color.RED
+    elif(rand == 1): return Color.GREEN
+    else: return Color.BLUE
+
+# Indique si un noeud est problématique
+def estProblematique(graph : Graph, colors : Color, index : int):
+    currColor = colors.nodes[index]
+    neigbour = graph.nodes[index]
+    for node in neigbour:
+        if colors.nodes[node - 1] == currColor:
+            return True
+    return False
+
+# Retourne la liste des noeuds problématiques
+def sontProblematique(graph : Graph, colors : Color):
+    nodesProblematiques = []
+    for iNode in range(len(graph.nodes)):
+        if(estProblematique(graph, colors,iNode)):
+            nodesProblematiques.append(iNode)
+    return nodesProblematiques
+
+def solvHeuristique(graph : Graph):
+    # Initialisation
+    colors = initColoration(graph)
+    for iNode in range(len(colors.nodes)):
+        colors.nodes[iNode] = getRandomColor()
+    
+    # Arretes problematiques
+    nodesProblematiques = sontProblematique(graph, colors)
+    k = len(nodesProblematiques)
+    
+    compt = 100
+    while compt > 0:
+        index = random.randrange(0,len(nodesProblematiques))    
+        colors.nodes[index] = getRandomColor()
+        nodesProblematiques = sontProblematique(graph, colors)
+        k = len(nodesProblematiques)
+        if k == 0 : 
+            return colors
+        compt -= 1
+        
+    return initColoration(graph)    
+    
+
 
 if __name__ == "__main__":
     # Création graph
@@ -100,11 +149,14 @@ if __name__ == "__main__":
     # Coloration
     # colorationMain = Coloration([Color.RED, Color.GREEN, Color.BLUE, Color.BLUE])
 
-    # Verification du graph d'entrée
-    # print(verificateur(graph, colorationMain))
+    # Verification du graph d'entrée (Q1)
+    # print(verificateur(graph, colorationMain))S
 
-    # Verification de toutes les possibilitées
+    # Verification de toutes les possibilitées (Q2)
     # print(genereEtTeste(graph))
     
-    # Backtracking
+    # Backtracking (Q3)
     # print(f"Question 3 -> {solvBackTracking(graph)}")
+
+    # Heuristique (Q4)
+    # print(f"Question 4 -> {solvHeuristique(graph)}") # Trouve que tres rarement
